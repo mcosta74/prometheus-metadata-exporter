@@ -1,5 +1,9 @@
 # prometheus-metadata-exporter
 
+![build](https://github.com/mcosta74/prometheus-metadata-exporter/actions/workflows/build.yml/badge.svg)
+![GitHub](https://img.shields.io/github/license/mcosta74/prometheus-metadata-exporter)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mcosta74/prometheus-metadata-exporter)
+
 Utility to get information about all metrics metadata available on a Prometheus instance
 
 # Usage
