@@ -19,13 +19,12 @@
             </thead>
             <tbody>
                 {{range .}}
-                    <tr>
-                        <td>{{ .Name }}</td>
-                        <td>{{ .Type }}</td>
-                        <td>{{ .Help }}</td>
-                        <td>{{ .Unit }}</td>
-                    </tr>
-                {{end}}
+                <tr>
+                    <td>{{ .Name }}</td>
+                    <td>{{ .Type }}</td>
+                    <td>{{ .Help }}</td>
+                    <td>{{ .Unit }}</td>
+                </tr>{{end}}
             </tbody>
         </table>
     </body>

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
 	"os"
 	"sort"
@@ -16,11 +17,43 @@ type renderer interface {
 	Render(metaInfo data) error
 }
 
+func newRenderer(format string, templatesFS fs.FS) renderer {
+	var r renderer
+	switch format {
+	case "text":
+		r = &consoleRenderer{}
+
+	case "csv":
+		r = &csvRenderer{}
+
+	case "html":
+		r = &templateRenderer[*template.Template]{
+			fs:           templatesFS,
+			templateName: "templates/output.html",
+			parseFunc:    template.ParseFS,
+		}
+
+	case "md":
+		r = &templateRenderer[*txttemplate.Template]{
+			fs:           templatesFS,
+			templateName: "templates/output.md",
+			parseFunc:    txttemplate.ParseFS,
+		}
+
+	case "json":
+		r = &jsonRenderer{}
+
+	default:
+		r = &consoleRenderer{}
+	}
+	return r
+}
+
 type consoleRenderer struct{}
 
 func (r *consoleRenderer) Render(metaInfo data) error {
 	keys := make([]string, 0, len(metaInfo))
-	for k, _ := range metaInfo {
+	for k := range metaInfo {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
@@ -41,11 +74,7 @@ func (r *consoleRenderer) Render(metaInfo data) error {
 type jsonRenderer struct{}
 
 func (r *jsonRenderer) Render(metaInfo data) error {
-	keys := make([]string, 0, len(metaInfo))
-	for k, _ := range metaInfo {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	keys := sortedKeys(metaInfo)
 
 	type record struct {
 		Name string `json:"name,omitempty"`
@@ -68,11 +97,7 @@ func (r *jsonRenderer) Render(metaInfo data) error {
 type csvRenderer struct{}
 
 func (r *csvRenderer) Render(metaInfo data) error {
-	keys := make([]string, 0, len(metaInfo))
-	for k, _ := range metaInfo {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	keys := sortedKeys(metaInfo)
 
 	w := csv.NewWriter(os.Stdout)
 	w.Write([]string{"Name, Type, Help, Unit"})
@@ -86,18 +111,20 @@ func (r *csvRenderer) Render(metaInfo data) error {
 	return nil
 }
 
-type htmlRenderer struct {
-	fs fs.FS
+type Executer interface {
+	Execute(io.Writer, any) error
 }
 
-func (r *htmlRenderer) Render(metaInfo data) error {
-	keys := make([]string, 0, len(metaInfo))
-	for k, _ := range metaInfo {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+type templateRenderer[T Executer] struct {
+	fs           fs.FS
+	templateName string
+	parseFunc    func(fs.FS, ...string) (T, error)
+}
 
-	t, err := template.ParseFS(r.fs, "templates/output.html")
+func (r *templateRenderer[T]) Render(metaInfo data) error {
+	keys := sortedKeys(metaInfo)
+
+	t, err := r.parseFunc(r.fs, r.templateName)
 	if err != nil {
 		return err
 	}
@@ -118,34 +145,11 @@ func (r *htmlRenderer) Render(metaInfo data) error {
 	return t.Execute(os.Stdout, records)
 }
 
-type mdRenderer struct {
-	fs fs.FS
-}
-
-func (r *mdRenderer) Render(metaInfo data) error {
+func sortedKeys(metaInfo data) []string {
 	keys := make([]string, 0, len(metaInfo))
 	for k, _ := range metaInfo {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-
-	t, err := txttemplate.ParseFS(r.fs, "templates/output.md")
-	if err != nil {
-		return err
-	}
-
-	type record struct {
-		Name string
-		Type string
-		Help string
-		Unit string
-	}
-
-	records := make([]record, 0)
-	for _, k := range keys {
-		for _, item := range metaInfo[k] {
-			records = append(records, record{k, item.Type, item.Help, item.Unit})
-		}
-	}
-	return t.Execute(os.Stdout, records)
+	return keys
 }

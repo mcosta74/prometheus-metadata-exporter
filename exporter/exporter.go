@@ -12,28 +12,8 @@ type Exporter interface {
 }
 
 func NewExporter(format string, templatesFS fs.FS) Exporter {
-	var r renderer
-	switch format {
-	case "text":
-		r = &consoleRenderer{}
-
-	case "csv":
-		r = &csvRenderer{}
-
-	case "html":
-		r = &htmlRenderer{fs: templatesFS}
-
-	case "md":
-		r = &mdRenderer{fs: templatesFS}
-
-	case "json":
-		r = &jsonRenderer{}
-
-	default:
-		r = &consoleRenderer{}
-	}
 	return &exporter{
-		r: r,
+		r: newRenderer(format, templatesFS),
 	}
 }
 
