@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.2.0] - 2023-05-30
+
+### Changed
+- use templates also for TXT and CSV renderer
+- use generic template based renderer
+
 ## [0.1.0] - 2023-05-30
 
 ### Added
