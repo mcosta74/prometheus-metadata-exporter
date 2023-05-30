@@ -1,0 +1,4 @@
+| Name | Type | Help | Unit |
+| ---- | ---- | ---- | ---- |
+{{range . }}| {{ .Name }} | {{ .Type }} | {{ .Help }} | {{ .Unit }} |
+{{end}}

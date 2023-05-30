@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <title>Prometheus metrics</title>
+    </head>
+    <style>
+        table, td, th {
+            border: 1px solid black;
+        }
+    </style>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Help</th>
+                    <th>Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .}}
+                    <tr>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Type }}</td>
+                        <td>{{ .Help }}</td>
+                        <td>{{ .Unit }}</td>
+                    </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </body>
+</html>
