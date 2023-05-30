@@ -31,6 +31,6 @@ func main() {
 }
 
 func initFlags(fs *flag.FlagSet) {
-	prometheusUrl = fs.String("prometheus.url", "localhost:9090", "URL of the Prometheus server to get information from.")
+	prometheusUrl = fs.String("prometheus.url", "http://localhost:9090", "URL of the Prometheus server to get information from.")
 	format = fs.String("format", "text", "Output format (text, csv, html, md, json)")
 }

@@ -51,7 +51,7 @@ func (exp *exporter) Export(baseUrl string) error {
 }
 
 func getMetadata(baseUrl string) (data, error) {
-	resp, err := http.Get(fmt.Sprintf("http://%s/api/v1/metadata", baseUrl))
+	resp, err := http.Get(fmt.Sprintf("%s/api/v1/metadata", baseUrl))
 	if err != nil {
 		return nil, err
 	}
